@@ -1,0 +1,11 @@
+/storage/logs/*.log
+/public/uploads/qrcodes/*.png
+!/public/uploads/qrcodes/.gitkeep
+/public/uploads/avatars/*
+!/public/uploads/avatars/.gitkeep
+/public/uploads/logos/*
+!/public/uploads/logos/.gitkeep
+/vendor/phpqrcode/cache/*
+!/vendor/phpqrcode/cache/.gitkeep
+.DS_Store
+Thumbs.db

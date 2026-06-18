@@ -1,0 +1,36 @@
+/* public/assets/css/app.css
+   Small custom touches on top of Tailwind CDN utility classes. */
+
+::selection {
+    background-color: #B3492B;
+    color: #fff;
+}
+
+.font-mono-token {
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.04em;
+}
+
+/* Smooth transitions for interactive elements not covered by Tailwind's transition utility */
+a, button {
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+/* Scrollbar styling for the sidebar nav */
+nav::-webkit-scrollbar {
+    width: 4px;
+}
+nav::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.15);
+    border-radius: 4px;
+}
+
+/* Print styles for gate pass / QR pages */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    body {
+        background: white;
+    }
+}

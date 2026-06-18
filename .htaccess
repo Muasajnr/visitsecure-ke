@@ -1,0 +1,5 @@
+RewriteEngine On
+
+# Forward everything to the /public folder, which is the real document root.
+RewriteCond %{REQUEST_URI} !^/public/
+RewriteRule ^(.*)$ /public/$1 [L]
