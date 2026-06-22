@@ -62,7 +62,7 @@ if (isPost()) {
     $visit = Visit::find((int)$visitId, $orgId);
 
     // Generate the QR pass image now (will only grant entry once host approves)
-    $qrPath = QrCode::generate($visit['qr_code'], 'visit_' . $visit['uuid']);
+    $qrPath = QrCodeGenerator::generate($visit['qr_code'], 'visit_' . $visit['uuid']);
     Visit::setQrImage((int)$visitId, $qrPath);
 
     // Notify the host that a walk-in is waiting for their approval

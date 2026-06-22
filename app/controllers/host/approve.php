@@ -29,7 +29,7 @@ Visit::approve($visitId, $orgId, $user['id']);
 // Generate the QR gate pass now that it's approved
 $visit = Visit::find($visitId, $orgId);
 if (empty($visit['qr_image_path'])) {
-    $qrPath = QrCode::generate($visit['qr_code'], 'visit_' . $visit['uuid']);
+    $qrPath = QrCodeGenerator::generate($visit['qr_code'], 'visit_' . $visit['uuid']);
     Visit::setQrImage($visitId, $qrPath);
     $visit = Visit::find($visitId, $orgId);
 }
@@ -38,14 +38,14 @@ if (empty($visit['qr_image_path'])) {
 if (!empty($visit['visitor_user_id'])) {
     NotificationService::sendGatePass($visit, ['id' => $visit['visitor_user_id']]);
 } elseif (!empty($visit['visitor_email'])) {
-    $qrUrl = QrCode::publicUrl($visit['qr_image_path']);
-    $html = '<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px;border:1px solid #e5e7eb;border-radius:8px;">'
-        . '<h2 style="color:#0f172a;">Your visit has been approved</h2>'
-        . "<p style=\"color:#334155;font-size:15px;line-height:1.6;\">Your visit to {$visit['host_name']} has been approved. Present this QR code at the gate for entry.</p>"
-        . "<div style=\"text-align:center;margin:24px 0;\"><img src=\"{$qrUrl}\" style=\"width:200px;height:200px;\"></div>"
-        . '<p style="color:#94a3b8;font-size:12px;margin-top:20px;">This is an automated message from VisitSecure KE.</p></div>';
-    $overrides = DB::one("SELECT * FROM org_settings WHERE org_id = ?", [$orgId]) ?: [];
-    Mailer::send($visit['visitor_email'], 'Your visit has been approved', $html, $overrides);
+    NotificationService::emailGatePass(
+        $visit['visitor_email'],
+        $orgId,
+        'Your visit has been approved',
+        $visit,
+        'Your visit has been approved',
+        "Your visit to {$visit['host_name']} has been approved. Present this QR code at the gate for entry."
+    );
 }
 
 logAudit($orgId, $user['id'], 'visit_approved', "Approved visit for {$visit['visitor_name']}");

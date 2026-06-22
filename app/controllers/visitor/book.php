@@ -54,7 +54,7 @@ if (isPost()) {
     ]);
 
     $visit = Visit::find((int)$visitId, (int)$orgId);
-    $qrPath = QrCode::generate($visit['qr_code'], 'visit_' . $visit['uuid']);
+    $qrPath = QrCodeGenerator::generate($visit['qr_code'], 'visit_' . $visit['uuid']);
     Visit::setQrImage((int)$visitId, $qrPath);
 
     NotificationService::notify(

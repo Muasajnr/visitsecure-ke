@@ -32,18 +32,18 @@ class Mailer
      * Never throws - logs failures to storage/logs/mail.log instead, so a
      * mail outage never breaks the booking/check-in flow.
      */
-    public static function send(string $toEmail, string $subject, string $htmlBody, array $overrides = []): bool
+    public static function send(string $toEmail, string $subject, string $htmlBody, array $overrides = [], array $inlineImages = []): bool
     {
         try {
             $mailer = new self($overrides);
-            return $mailer->dispatch($toEmail, $subject, $htmlBody);
+            return $mailer->dispatch($toEmail, $subject, $htmlBody, $inlineImages);
         } catch (Throwable $e) {
             self::log('ERROR sending to ' . $toEmail . ': ' . $e->getMessage());
             return false;
         }
     }
 
-    private function dispatch(string $toEmail, string $subject, string $htmlBody): bool
+    private function dispatch(string $toEmail, string $subject, string $htmlBody, array $inlineImages = []): bool
     {
         $c = $this->config;
 
@@ -89,16 +89,42 @@ class Mailer
         $this->write("DATA");
         $this->read();
 
-        $boundary = md5(uniqid((string) time()));
+        $boundary = '----=_Part_' . md5(uniqid((string) time(), true));
         $headers = [];
         $headers[] = "From: {$c['from_name']} <{$c['from_email']}>";
         $headers[] = "To: <{$toEmail}>";
         $headers[] = "Subject: " . $this->encodeSubject($subject);
         $headers[] = "MIME-Version: 1.0";
-        $headers[] = "Content-Type: text/html; charset=UTF-8";
         $headers[] = "Date: " . date('r');
 
-        $message = implode("\r\n", $headers) . "\r\n\r\n" . $htmlBody . "\r\n.";
+        if (empty($inlineImages)) {
+            $headers[] = "Content-Type: text/html; charset=UTF-8";
+            $message = implode("\r\n", $headers) . "\r\n\r\n" . $htmlBody . "\r\n.";
+        } else {
+            $headers[] = "Content-Type: multipart/related; boundary=\"{$boundary}\"";
+            $body = "--{$boundary}\r\n";
+            $body .= "Content-Type: text/html; charset=UTF-8\r\n";
+            $body .= "Content-Transfer-Encoding: 7bit\r\n\r\n";
+            $body .= $htmlBody . "\r\n";
+
+            foreach ($inlineImages as $cid => $filePath) {
+                if (!is_readable($filePath)) {
+                    continue;
+                }
+                $filename = basename($filePath);
+                $data = chunk_split(base64_encode((string) file_get_contents($filePath)));
+                $body .= "--{$boundary}\r\n";
+                $body .= "Content-Type: image/png; name=\"{$filename}\"\r\n";
+                $body .= "Content-Transfer-Encoding: base64\r\n";
+                $body .= "Content-ID: <{$cid}>\r\n";
+                $body .= "Content-Disposition: inline; filename=\"{$filename}\"\r\n\r\n";
+                $body .= $data . "\r\n";
+            }
+
+            $body .= "--{$boundary}--\r\n";
+            $message = implode("\r\n", $headers) . "\r\n\r\n" . $body . "\r\n.";
+        }
+
         $this->write($message);
         $sendResponse = $this->read();
 

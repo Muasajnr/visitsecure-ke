@@ -11,9 +11,9 @@ define('APP_DEBUG', true);  // set to false in production
 
 // ---- URLs ----
 // If your Laragon project is at C:/laragon/www/visitsecure-ke
-// and Laragon auto-domain is on, BASE_URL might be http://visitsecure-ke.test
+// and Laragon auto-domain is on, BASE_URL might be http://visitsecure-ke.ke
 // Otherwise it's http://localhost/visitsecure-ke/public
-define('BASE_URL', 'http://visitsecure-ke.test');
+define('BASE_URL', 'http://visitsecure-ke.ke');
 
 // ---- Paths ----
 define('ROOT_PATH', dirname(__DIR__, 2));

@@ -52,20 +52,23 @@ if (isPost()) {
     ]);
 
     $visit = Visit::find((int)$visitId, $orgId);
-    $qrPath = QrCode::generate($visit['qr_code'], 'visit_' . $visit['uuid']);
+    $qrPath = QrCodeGenerator::generate($visit['qr_code'], 'visit_' . $visit['uuid']);
     Visit::setQrImage((int)$visitId, $qrPath);
     $visit = Visit::find((int)$visitId, $orgId);
 
     if ($visitorEmail) {
-        $qrUrl = QrCode::publicUrl($qrPath);
-        $html = '<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px;border:1px solid #e5e7eb;border-radius:8px;">'
-            . "<h2 style=\"color:#0f172a;\">You're registered for {$event['title']}</h2>"
-            . "<p style=\"color:#334155;font-size:15px;line-height:1.6;\">Present this QR code at the gate for entry to the event.</p>"
-            . "<div style=\"text-align:center;margin:24px 0;\"><img src=\"{$qrUrl}\" style=\"width:200px;height:200px;\"></div>"
-            . "<p style=\"color:#334155;font-size:14px;\"><strong>Location:</strong> " . ($visit['building_name'] ?? '') . ' - ' . ($visit['room_name'] ?? '') . "<br><strong>When:</strong> " . formatDate($event['start_datetime']) . "</p>"
-            . '<p style="color:#94a3b8;font-size:12px;margin-top:20px;">This is an automated message from VisitSecure KE.</p></div>';
-        $overrides = DB::one("SELECT * FROM org_settings WHERE org_id = ?", [$orgId]) ?: [];
-        Mailer::send($visitorEmail, "Your gate pass for {$event['title']}", $html, $overrides);
+        NotificationService::emailGatePass(
+            $visitorEmail,
+            $orgId,
+            "Your gate pass for {$event['title']}",
+            $visit,
+            "You're registered for {$event['title']}",
+            'Present this QR code at the gate for entry to the event.',
+            [
+                'Location: ' . trim(($visit['building_name'] ?? '') . ($visit['room_name'] ? ' - ' . $visit['room_name'] : '')),
+                'When: ' . formatDate($event['start_datetime']),
+            ]
+        );
     }
 
     logAudit($orgId, $user['id'], 'event_visitor_registered', "{$visitorName} registered for event '{$event['title']}'");

@@ -273,16 +273,14 @@ SET FOREIGN_KEY_CHECKS=1;
 -- SEED DATA: Super Admin + Demo Organization
 -- Default super admin password: Admin@123  (CHANGE AFTER FIRST LOGIN)
 -- Password hash below = bcrypt('Admin@123')
+-- Run database/seed.php after import for full demo users (all roles).
 -- =========================================================
 INSERT INTO organizations (uuid, name, slug, email, phone, address, subscription_status, is_active)
 VALUES (UUID(), 'VisitSecure Platform', 'platform', 'platform@visitsecure.ke', '0700000000', 'Nairobi, Kenya', 'active', 1);
 
 INSERT INTO users (uuid, org_id, role, full_name, email, password_hash, is_active, email_verified_at)
 VALUES (UUID(), NULL, 'super_admin', 'Platform Super Admin', 'admin@visitsecure.ke',
-'$2y$10$92Ix5x1Vf1qS1bA0F1KZAeQ6vP1pNQbqgq9D9V9z0X1y8Z1x2c3d4e', 1, NOW());
-
--- NOTE: The hash above is a placeholder. Run database/seed.php once to set a real bcrypt hash
--- for admin@visitsecure.ke with password Admin@123 (the seed script does this automatically).
+'$2y$10$9ruFnSc60U0W.3bKxcEAP.TF.Y0iOUZOgsZa.vCnX9D3sfA4QlXnS', 1, NOW());
 
 -- Demo organization for testing (Bihi Towers example)
 INSERT INTO organizations (uuid, name, slug, email, phone, address, subscription_status, is_active)

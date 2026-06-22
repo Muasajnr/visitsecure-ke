@@ -1,36 +1,74 @@
-/* public/assets/css/app.css
-   Small custom touches on top of Tailwind CDN utility classes. */
+/* public/assets/css/app.css */
 
 ::selection {
-    background-color: #B3492B;
+    background-color: #2563EB;
     color: #fff;
 }
 
-.font-mono-token {
-    font-family: 'JetBrains Mono', monospace;
-    letter-spacing: 0.04em;
-}
-
-/* Smooth transitions for interactive elements not covered by Tailwind's transition utility */
+/* Smooth base transitions */
 a, button {
-    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-/* Scrollbar styling for the sidebar nav */
+/* Form inputs — subtle ring on focus */
+input:focus, textarea:focus, select:focus {
+    outline: none;
+}
+
+/* Sidebar scrollbar */
 nav::-webkit-scrollbar {
     width: 4px;
 }
 nav::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.12);
     border-radius: 4px;
 }
 
-/* Print styles for gate pass / QR pages */
+/* Gate pass token font */
+.font-mono-token {
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.06em;
+}
+
+/* Status badge polish */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.6rem;
+    border-radius: 9999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    line-height: 1.4;
+    white-space: nowrap;
+}
+
+/* Table rows — subtle hover */
+tbody tr:hover {
+    background-color: rgba(30, 58, 95, 0.025);
+}
+
+/* Stat card hover lift */
+.stat-card:hover {
+    box-shadow: 0 2px 8px rgba(30, 58, 95, 0.08);
+}
+
+/* Print styles */
 @media print {
     .no-print {
         display: none !important;
     }
     body {
         background: white;
+    }
+    aside, header {
+        display: none !important;
+    }
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
     }
 }

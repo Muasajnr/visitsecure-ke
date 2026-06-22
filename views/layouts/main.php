@@ -12,9 +12,9 @@
     theme: {
       extend: {
         colors: {
-          ink:   '#0F1B2D',
-          brick: '#B3492B',
-          paper: '#F7F5F0',
+          ink:   '#1E3A5F',
+          brick: '#2563EB',
+          paper: '#EFF6FF',
           verigreen: '#1F7A53',
         },
         fontFamily: {

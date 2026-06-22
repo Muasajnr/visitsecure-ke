@@ -33,20 +33,29 @@ C:\laragon\www\visitsecure-ke
    ```
    (Default Laragon MySQL root password is usually empty — just press Enter.)
 
-### Step 3 — Set the real Super Admin password
-The schema seeds a `super_admin` user with a placeholder password hash. Run the seed script once to set a guaranteed-working password:
+### Step 3 — Seed demo accounts
+Run the seed script once to set guaranteed-working passwords for all test roles:
 
 - Visit in your browser: `http://localhost/visitsecure-ke/database/seed.php`
 - Or via CLI: `php database/seed.php`
 
-This sets the login to:
-- **Email:** `admin@visitsecure.ke`
-- **Password:** `Admin@123` (change this after logging in)
+This creates/resets the following logins:
+
+| Role | Email | Password |
+|------|-------|----------|
+| Super Admin | `admin@visitsecure.ke` | `Admin@123` |
+| Org Admin | `orgadmin@bihi.demo` | `Demo@123` |
+| Gateman | `gateman@bihi.demo` | `Demo@123` |
+| Host | `host@bihi.demo` | `Demo@123` |
+| Event Manager | `events@bihi.demo` | `Demo@123` |
+| Visitor | `visitor@bihi.demo` | `Demo@123` |
+
+The demo org **Bihi Properties Ltd** is set up with Bihi Towers → Floor 6 → Conference 6, and the host is assigned to that room.
 
 ### Step 4 — Configure the app
 Open `app/config/app.php` and set `BASE_URL` to match how you'll access the site:
 
-- If using a Laragon auto virtual host (recommended): `http://visitsecure-ke.test`
+- If using a Laragon auto virtual host (recommended): `http://visitsecure-ke.ke`
   (Laragon auto-creates `*.test` domains for folders in `www` — just enable "Auto Virtual Hosts" in Laragon's menu and restart Apache.)
 - If using plain localhost: `http://localhost/visitsecure-ke/public`
 
@@ -68,7 +77,7 @@ To get a Gmail App Password:
 Each organisation can later override this with their own Gmail sender from **Org Admin → Settings**.
 
 ### Step 6 — Visit the site
-- With auto virtual host: `http://visitsecure-ke.test`
+- With auto virtual host: `http://visitsecure-ke.ke`
 - Without: `http://localhost/visitsecure-ke/public`
 
 You should see the VisitSecure KE landing page.
@@ -77,11 +86,23 @@ You should see the VisitSecure KE landing page.
 
 ## 3. Logging in
 
+Run `php database/seed.php` first if you haven't already (see Step 3 above).
+
 **Platform Super Admin** (manages all organisations & subscriptions):
 - Email: `admin@visitsecure.ke`
 - Password: `Admin@123`
 
-**To test as an organisation**, go to `/signup/organization` and register a new organisation — this creates the organisation and your Org Admin login in one step. From the Org Admin dashboard you can then:
+**Demo organisation accounts** (Bihi Properties Ltd — all use password `Demo@123`):
+
+| Role | Email |
+|------|-------|
+| Org Admin | `orgadmin@bihi.demo` |
+| Gateman | `gateman@bihi.demo` |
+| Host | `host@bihi.demo` |
+| Event Manager | `events@bihi.demo` |
+| Visitor | `visitor@bihi.demo` |
+
+**To create your own organisation**, go to `/signup/organization` and register — this creates the organisation and your Org Admin login in one step. From the Org Admin dashboard you can then:
 1. Add a Building (e.g. "Bihi Towers")
 2. Add Floors to that building (e.g. "Floor 6")
 3. Add Rooms/firms to that floor (e.g. "Conference 6", "Cap Africa Consulting")

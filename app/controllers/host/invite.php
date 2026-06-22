@@ -51,22 +51,26 @@ if (isPost()) {
     ]);
 
     $visit = Visit::find((int)$visitId, $orgId);
-    $qrPath = QrCode::generate($visit['qr_code'], 'visit_' . $visit['uuid']);
+    $qrPath = QrCodeGenerator::generate($visit['qr_code'], 'visit_' . $visit['uuid']);
     Visit::setQrImage((int)$visitId, $qrPath);
     $visit = Visit::find((int)$visitId, $orgId);
 
     // Email the visitor their gate pass directly (visitor may not have an account)
     if ($visitorEmail) {
-        $qrUrl = QrCode::publicUrl($qrPath);
-        $html = '<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px;border:1px solid #e5e7eb;border-radius:8px;">'
-            . '<h2 style="color:#0f172a;">Your Gate Pass</h2>'
-            . "<p style=\"color:#334155;font-size:15px;line-height:1.6;\">You have been invited by {$user['full_name']}. Present this QR code at the gate for entry.</p>"
-            . "<div style=\"text-align:center;margin:24px 0;\"><img src=\"{$qrUrl}\" style=\"width:200px;height:200px;\"></div>"
-            . "<p style=\"color:#334155;font-size:14px;\"><strong>Visitor:</strong> {$visitorName}<br><strong>Host:</strong> {$user['full_name']}<br><strong>Location:</strong> " . ($visit['building_name'] ?? '') . ' - ' . ($visit['room_name'] ?? '') . "<br><strong>Scheduled:</strong> " . formatDate($scheduledStart) . "</p>"
-            . '<p style="color:#94a3b8;font-size:12px;margin-top:20px;">This is an automated message from VisitSecure KE.</p></div>';
-
-        $overrides = DB::one("SELECT * FROM org_settings WHERE org_id = ?", [$orgId]) ?: [];
-        Mailer::send($visitorEmail, 'Your Gate Pass for ' . ($visit['building_name'] ?? 'your visit'), $html, $overrides);
+        NotificationService::emailGatePass(
+            $visitorEmail,
+            $orgId,
+            'Your Gate Pass for ' . ($visit['building_name'] ?? 'your visit'),
+            $visit,
+            'Your Gate Pass',
+            "You have been invited by {$user['full_name']}. Present this QR code at the gate for entry.",
+            [
+                "Visitor: {$visitorName}",
+                "Host: {$user['full_name']}",
+                'Location: ' . trim(($visit['building_name'] ?? '') . ($visit['room_name'] ? ' - ' . $visit['room_name'] : '')),
+                'Scheduled: ' . formatDate($scheduledStart),
+            ]
+        );
     }
 
     logAudit($orgId, $user['id'], 'visitor_invited', "{$user['full_name']} invited {$visitorName}");

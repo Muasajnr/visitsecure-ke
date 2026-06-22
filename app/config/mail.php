@@ -16,7 +16,7 @@
 define('MAIL_HOST', 'smtp.gmail.com');
 define('MAIL_PORT', 587);
 define('MAIL_ENCRYPTION', 'tls'); // tls or ssl
-define('MAIL_USERNAME', 'youraddress@gmail.com');   // <-- change this
-define('MAIL_PASSWORD', 'your16charapppassword');    // <-- change this (Gmail App Password)
-define('MAIL_FROM_EMAIL', 'youraddress@gmail.com');  // <-- change this
+define('MAIL_USERNAME', 'elmmwas7@gmail.com');  
+define('MAIL_PASSWORD', 'ckzq wdvy wfbz dpki');   
+define('MAIL_FROM_EMAIL', 'elmmwas7@gmail.com');  
 define('MAIL_FROM_NAME', 'VisitSecure KE');

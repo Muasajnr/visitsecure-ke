@@ -16,6 +16,7 @@ require_once __DIR__ . '/core/Mailer.php';
 require_once __DIR__ . '/core/NotificationService.php';
 
 require_once __DIR__ . '/helpers/functions.php';
+require_once __DIR__ . '/helpers/icons.php';
 
 // Autoload models
 foreach (glob(__DIR__ . '/models/*.php') as $modelFile) {

@@ -4,11 +4,14 @@
  *
  * Thin wrapper around the bundled phpqrcode library (vendor/phpqrcode).
  * Requires the PHP GD extension (enabled by default in Laragon).
+ *
+ * Named QrCodeGenerator (not QrCode) because PHP class names are case-insensitive
+ * and would collide with the library's QRcode class.
  */
 
 require_once ROOT_PATH . '/vendor/phpqrcode/qrlib.php';
 
-class QrCode
+class QrCodeGenerator
 {
     /**
      * Generates a QR code PNG for the given text/token and saves it
@@ -32,6 +35,12 @@ class QrCode
 
     public static function publicUrl(string $relativePath): string
     {
-        return BASE_URL . '/' . $relativePath;
+        return BASE_URL . '/' . ltrim($relativePath, '/');
+    }
+
+    /** Absolute filesystem path for a stored QR image. */
+    public static function absolutePath(string $relativePath): string
+    {
+        return PUBLIC_PATH . '/' . ltrim($relativePath, '/');
     }
 }
