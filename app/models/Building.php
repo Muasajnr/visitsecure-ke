@@ -26,4 +26,17 @@ class Building
             [$orgId, $data['name'], $data['address'] ?? null, $data['description'] ?? null]
         );
     }
+
+    public static function update(int $id, int $orgId, array $data): int
+    {
+        return DB::run(
+            "UPDATE buildings SET name = ?, address = ?, description = ? WHERE id = ? AND org_id = ?",
+            [$data['name'], $data['address'] ?? null, $data['description'] ?? null, $id, $orgId]
+        );
+    }
+
+    public static function delete(int $id, int $orgId): int
+    {
+        return DB::run("DELETE FROM buildings WHERE id = ? AND org_id = ?", [$id, $orgId]);
+    }
 }

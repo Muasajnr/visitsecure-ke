@@ -51,12 +51,13 @@ $hasFilters = $filters['status'] || $filters['building_id'] || $filters['date'];
                     <th class="px-5 py-3 font-semibold">Source</th>
                     <th class="px-5 py-3 font-semibold">Status</th>
                     <th class="px-5 py-3 font-semibold">Created</th>
+                    <th class="px-5 py-3 font-semibold"></th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-ink/5">
                 <?php if (empty($visits)): ?>
                     <tr>
-                        <td colspan="6" class="px-5 py-14 text-center">
+                        <td colspan="7" class="px-5 py-14 text-center">
                             <p class="text-ink/40 text-sm">
                                 <?= $hasFilters ? 'No visits match those filters — try clearing some.' : 'No visits recorded yet. They\'ll appear here once your gateman starts checking people in.' ?>
                             </p>
@@ -77,6 +78,9 @@ $hasFilters = $filters['status'] || $filters['building_id'] || $filters['date'];
                     <td class="px-5 py-3 text-ink/50 capitalize"><?= e(str_replace('_',' ',$v['source'])) ?><?= $v['is_walk_in'] ? ' <span class="text-[10px] bg-ink/5 rounded px-1">walk-in</span>' : '' ?></td>
                     <td class="px-5 py-3"><?= statusBadge($v['status']) ?></td>
                     <td class="px-5 py-3 text-ink/45"><?= formatDate($v['created_at']) ?></td>
+                    <td class="px-5 py-3 text-right">
+                        <a href="<?= url('/orgadmin/visits/' . $v['id']) ?>" class="text-xs text-brick font-semibold hover:underline">Manage</a>
+                    </td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>

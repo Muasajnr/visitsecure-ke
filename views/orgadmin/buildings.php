@@ -54,9 +54,36 @@
                 <?php if ($b['description']): ?>
                     <p class="text-sm text-ink/50 mt-3 leading-relaxed"><?= e($b['description']) ?></p>
                 <?php endif; ?>
-                <a href="<?= url('/orgadmin/buildings/' . $b['id'] . '/floors') ?>" class="inline-block mt-4 text-brick font-semibold text-sm hover:underline">
-                    Manage floors &amp; rooms &rarr;
-                </a>
+                <div class="flex flex-wrap items-center gap-3 mt-4">
+                    <a href="<?= url('/orgadmin/buildings/' . $b['id'] . '/floors') ?>" class="text-brick font-semibold text-sm hover:underline">
+                        Manage floors &amp; rooms &rarr;
+                    </a>
+                    <button type="button" onclick="toggleEl('editBuilding<?= $b['id'] ?>')" class="text-sm text-ink/55 hover:text-ink font-medium">Edit</button>
+                    <form method="POST" action="<?= url('/orgadmin/buildings/' . $b['id'] . '/delete') ?>" class="inline" onsubmit="return confirmAction('Delete this building and all its floors and rooms? This cannot be undone.')">
+                        <?= csrfField() ?>
+                        <button type="submit" class="text-sm text-red-600 hover:text-red-700 font-medium">Delete</button>
+                    </form>
+                </div>
+                <div id="editBuilding<?= $b['id'] ?>" class="hidden mt-4 pt-4 border-t border-ink/10">
+                    <form method="POST" action="<?= url('/orgadmin/buildings/' . $b['id'] . '/update') ?>" class="grid md:grid-cols-3 gap-3">
+                        <?= csrfField() ?>
+                        <div>
+                            <label class="block text-xs font-medium mb-1 text-ink/60">Name</label>
+                            <input type="text" name="name" required value="<?= e($b['name']) ?>" class="w-full px-3 py-2 rounded-lg border border-ink/15 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium mb-1 text-ink/60">Address</label>
+                            <input type="text" name="address" value="<?= e($b['address'] ?? '') ?>" class="w-full px-3 py-2 rounded-lg border border-ink/15 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium mb-1 text-ink/60">Notes</label>
+                            <input type="text" name="description" value="<?= e($b['description'] ?? '') ?>" class="w-full px-3 py-2 rounded-lg border border-ink/15 text-sm">
+                        </div>
+                        <div class="md:col-span-3">
+                            <button type="submit" class="bg-ink text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-brick transition">Save changes</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         <?php endforeach; ?>
     </div>

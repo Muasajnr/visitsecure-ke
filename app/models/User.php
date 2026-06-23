@@ -99,4 +99,49 @@ class User
         }
         return (bool) DB::one("SELECT id FROM users WHERE email = ? AND org_id = ?", [$email, $orgId]);
     }
+
+    public static function emailExistsForOther(string $email, ?int $orgId, int $excludeUserId): bool
+    {
+        if ($orgId === null) {
+            return (bool) DB::one(
+                "SELECT id FROM users WHERE email = ? AND org_id IS NULL AND id != ?",
+                [$email, $excludeUserId]
+            );
+        }
+        return (bool) DB::one(
+            "SELECT id FROM users WHERE email = ? AND org_id = ? AND id != ?",
+            [$email, $orgId, $excludeUserId]
+        );
+    }
+
+    public static function updateStaff(int $id, int $orgId, array $data): int
+    {
+        $params = [
+            $data['full_name'],
+            $data['email'],
+            $data['phone'] ?? null,
+            $data['role'],
+            $data['room_id'] ?? null,
+            $id,
+            $orgId,
+        ];
+        $sql = "UPDATE users SET full_name = ?, email = ?, phone = ?, role = ?, room_id = ? WHERE id = ? AND org_id = ? AND role != 'org_admin'";
+
+        if (!empty($data['password'])) {
+            $sql = "UPDATE users SET full_name = ?, email = ?, phone = ?, role = ?, room_id = ?, password_hash = ? WHERE id = ? AND org_id = ? AND role != 'org_admin'";
+            $hash = password_hash($data['password'], PASSWORD_BCRYPT);
+            $params = [
+                $data['full_name'],
+                $data['email'],
+                $data['phone'] ?? null,
+                $data['role'],
+                $data['room_id'] ?? null,
+                $hash,
+                $id,
+                $orgId,
+            ];
+        }
+
+        return DB::run($sql, $params);
+    }
 }

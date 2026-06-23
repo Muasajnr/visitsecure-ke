@@ -44,6 +44,21 @@ class Organization
         return DB::run("UPDATE organizations SET subscription_status = ? WHERE id = ?", [$status, $id]);
     }
 
+    public static function update(int $id, array $data): int
+    {
+        return DB::run(
+            "UPDATE organizations SET name = ?, email = ?, phone = ?, address = ?, subscription_plan = ? WHERE id = ?",
+            [
+                $data['name'],
+                $data['email'],
+                $data['phone'] ?? null,
+                $data['address'] ?? null,
+                $data['subscription_plan'] ?? 'basic',
+                $id,
+            ]
+        );
+    }
+
     public static function toggleActive(int $id, int $isActive): int
     {
         return DB::run("UPDATE organizations SET is_active = ? WHERE id = ?", [$isActive, $id]);

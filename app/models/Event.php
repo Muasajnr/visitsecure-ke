@@ -58,4 +58,33 @@ class Event
     {
         return (int) DB::one("SELECT COUNT(*) c FROM visits WHERE event_id = ?", [$eventId])['c'];
     }
+
+    public static function update(int $id, int $orgId, array $data): int
+    {
+        return DB::run(
+            "UPDATE events SET title = ?, description = ?, building_id = ?, floor_id = ?, room_id = ?,
+             start_datetime = ?, end_datetime = ?, max_visitors = ?
+             WHERE id = ? AND org_id = ? AND status != 'cancelled'",
+            [
+                $data['title'],
+                $data['description'] ?? null,
+                $data['building_id'],
+                $data['floor_id'] ?? null,
+                $data['room_id'] ?? null,
+                $data['start_datetime'],
+                $data['end_datetime'],
+                $data['max_visitors'] ?? null,
+                $id,
+                $orgId,
+            ]
+        );
+    }
+
+    public static function cancel(int $id, int $orgId): int
+    {
+        return DB::run(
+            "UPDATE events SET status = 'cancelled' WHERE id = ? AND org_id = ? AND status != 'cancelled'",
+            [$id, $orgId]
+        );
+    }
 }

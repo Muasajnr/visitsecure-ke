@@ -19,12 +19,13 @@
                     <th class="px-5 py-3 font-semibold">When</th>
                     <th class="px-5 py-3 font-semibold">Registered</th>
                     <th class="px-5 py-3 font-semibold">Status</th>
+                    <th class="px-5 py-3 font-semibold"></th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-ink/5">
                 <?php if (empty($events)): ?>
                     <tr>
-                        <td colspan="5" class="px-5 py-14 text-center">
+                        <td colspan="6" class="px-5 py-14 text-center">
                             <div class="flex justify-center text-ink/30"><?= icon('sparkles', 'w-8 h-8') ?></div>
                             <p class="font-display font-semibold mt-2">No events scheduled</p>
                             <p class="text-sm text-ink/45 mt-1">Create an event to give visitors a registration link and issue gate passes automatically.</p>
@@ -34,7 +35,9 @@
                 <?php endif; ?>
                 <?php foreach ($events as $ev): ?>
                 <tr>
-                    <td class="px-5 py-3 font-medium"><?= e($ev['title']) ?></td>
+                    <td class="px-5 py-3 font-medium">
+                        <a href="<?= url('/events/' . $ev['id']) ?>" class="hover:text-brick transition"><?= e($ev['title']) ?></a>
+                    </td>
                     <td class="px-5 py-3 text-ink/60">
                         <?= e($ev['building_name'] ?? '—') ?><?= $ev['room_name'] ? ' · ' . e($ev['room_name']) : '' ?>
                     </td>
@@ -50,6 +53,16 @@
                         <?php endif; ?>
                     </td>
                     <td class="px-5 py-3"><?= statusBadge($ev['status']) ?></td>
+                    <td class="px-5 py-3 text-right whitespace-nowrap">
+                        <a href="<?= url('/events/' . $ev['id']) ?>" class="text-xs text-brick font-semibold hover:underline mr-3">View</a>
+                        <?php if ($ev['status'] !== 'cancelled'): ?>
+                        <a href="<?= url('/events/' . $ev['id'] . '/edit') ?>" class="text-xs text-ink/55 font-semibold hover:underline mr-3">Edit</a>
+                        <form method="POST" action="<?= url('/events/' . $ev['id'] . '/cancel') ?>" class="inline" onsubmit="return confirmAction('Cancel this event?')">
+                            <?= csrfField() ?>
+                            <button type="submit" class="text-xs text-red-600 font-semibold hover:underline">Cancel</button>
+                        </form>
+                        <?php endif; ?>
+                    </td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>

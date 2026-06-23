@@ -91,16 +91,74 @@
                 <td class="px-5 py-3"><?= statusBadge($s['is_active'] ? 'active' : 'suspended') ?></td>
                 <td class="px-5 py-3 text-right">
                     <?php if ($s['role'] !== 'org_admin'): ?>
-                    <form method="POST" action="<?= url('/orgadmin/users/' . $s['id'] . '/toggle') ?>" onsubmit="return confirmAction('Change this user\'s status?')">
-                        <?= csrfField() ?>
-                        <button type="submit" class="text-xs text-brick font-semibold hover:underline"><?= $s['is_active'] ? 'Deactivate' : 'Activate' ?></button>
-                    </form>
+                    <div class="flex items-center justify-end gap-3">
+                        <button type="button" onclick="toggleEl('editUser<?= $s['id'] ?>')" class="text-xs text-brick font-semibold hover:underline">Edit</button>
+                        <form method="POST" action="<?= url('/orgadmin/users/' . $s['id'] . '/toggle') ?>" class="inline" onsubmit="return confirmAction('Change this user\'s status?')">
+                            <?= csrfField() ?>
+                            <button type="submit" class="text-xs text-ink/50 font-semibold hover:underline"><?= $s['is_active'] ? 'Deactivate' : 'Activate' ?></button>
+                        </form>
+                    </div>
                     <?php else: ?>
                         <span class="text-ink/25 text-xs">admin</span>
                     <?php endif; ?>
                 </td>
             </tr>
+            <?php if ($s['role'] !== 'org_admin'): ?>
+            <tr id="editUser<?= $s['id'] ?>" class="hidden bg-ink/[0.02]">
+                <td colspan="5" class="px-5 py-4">
+                    <form method="POST" action="<?= url('/orgadmin/users/' . $s['id'] . '/update') ?>" class="grid md:grid-cols-3 gap-3">
+                        <?= csrfField() ?>
+                        <div>
+                            <label class="block text-xs font-medium mb-1 text-ink/60">Full name</label>
+                            <input type="text" name="full_name" required value="<?= e($s['full_name']) ?>" class="w-full px-3 py-2 rounded-lg border border-ink/15 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium mb-1 text-ink/60">Email</label>
+                            <input type="email" name="email" required value="<?= e($s['email']) ?>" class="w-full px-3 py-2 rounded-lg border border-ink/15 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium mb-1 text-ink/60">Phone</label>
+                            <input type="text" name="phone" value="<?= e($s['phone'] ?? '') ?>" class="w-full px-3 py-2 rounded-lg border border-ink/15 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium mb-1 text-ink/60">Role</label>
+                            <select name="role" class="edit-role-select w-full px-3 py-2 rounded-lg border border-ink/15 text-sm" data-user="<?= $s['id'] ?>">
+                                <option value="gateman" <?= $s['role'] === 'gateman' ? 'selected' : '' ?>>Gateman</option>
+                                <option value="host" <?= $s['role'] === 'host' ? 'selected' : '' ?>>Host</option>
+                                <option value="event_manager" <?= $s['role'] === 'event_manager' ? 'selected' : '' ?>>Event Manager</option>
+                            </select>
+                        </div>
+                        <div id="editRoomField<?= $s['id'] ?>" class="<?= $s['role'] === 'host' ? '' : 'hidden' ?>">
+                            <label class="block text-xs font-medium mb-1 text-ink/60">Room</label>
+                            <select name="room_id" class="w-full px-3 py-2 rounded-lg border border-ink/15 text-sm">
+                                <option value="">— Select room —</option>
+                                <?php foreach ($rooms as $r): ?>
+                                    <option value="<?= $r['id'] ?>" <?= (int)($s['room_id'] ?? 0) === (int)$r['id'] ? 'selected' : '' ?>><?= e($r['building_name']) ?> · <?= e($r['floor_name']) ?> · <?= e($r['name']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium mb-1 text-ink/60">New password <span class="text-ink/35">(optional)</span></label>
+                            <input type="text" name="password" minlength="6" placeholder="Leave blank to keep" class="w-full px-3 py-2 rounded-lg border border-ink/15 text-sm">
+                        </div>
+                        <div class="md:col-span-3">
+                            <button type="submit" class="bg-ink text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-brick transition">Save changes</button>
+                        </div>
+                    </form>
+                </td>
+            </tr>
+            <?php endif; ?>
             <?php endforeach; ?>
         </tbody>
     </table>
 </div>
+
+<script>
+document.querySelectorAll('.edit-role-select').forEach(function (sel) {
+    sel.addEventListener('change', function () {
+        var uid = this.dataset.user;
+        var field = document.getElementById('editRoomField' + uid);
+        if (field) field.classList.toggle('hidden', this.value !== 'host');
+    });
+});
+</script>

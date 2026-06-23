@@ -38,6 +38,40 @@
 </div>
 
 <div class="grid md:grid-cols-2 gap-5 mb-6">
+    <!-- Organisation details -->
+    <div class="bg-white rounded-xl border border-ink/10 p-6">
+        <h2 class="font-display font-semibold mb-1">Organisation details</h2>
+        <p class="text-sm text-ink/55 mb-5 leading-relaxed">Update name, contact info, and subscription plan.</p>
+        <form method="POST" action="<?= url('/superadmin/organizations/' . $org['id'] . '/update') ?>" class="space-y-3">
+            <?= csrfField() ?>
+            <div>
+                <label class="block text-xs font-medium mb-1 text-ink/60">Name</label>
+                <input type="text" name="name" required value="<?= e($org['name']) ?>" class="w-full px-3 py-2 rounded-lg border border-ink/15 text-sm">
+            </div>
+            <div>
+                <label class="block text-xs font-medium mb-1 text-ink/60">Email</label>
+                <input type="email" name="email" required value="<?= e($org['email']) ?>" class="w-full px-3 py-2 rounded-lg border border-ink/15 text-sm">
+            </div>
+            <div>
+                <label class="block text-xs font-medium mb-1 text-ink/60">Phone</label>
+                <input type="text" name="phone" value="<?= e($org['phone'] ?? '') ?>" class="w-full px-3 py-2 rounded-lg border border-ink/15 text-sm">
+            </div>
+            <div>
+                <label class="block text-xs font-medium mb-1 text-ink/60">Address</label>
+                <input type="text" name="address" value="<?= e($org['address'] ?? '') ?>" class="w-full px-3 py-2 rounded-lg border border-ink/15 text-sm">
+            </div>
+            <div>
+                <label class="block text-xs font-medium mb-1 text-ink/60">Plan</label>
+                <select name="subscription_plan" class="w-full px-3 py-2 rounded-lg border border-ink/15 text-sm">
+                    <?php foreach (['basic','standard','premium','enterprise'] as $plan): ?>
+                        <option value="<?= $plan ?>" <?= $org['subscription_plan'] === $plan ? 'selected' : '' ?>><?= ucfirst($plan) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <button type="submit" class="bg-ink text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-brick transition">Save details</button>
+        </form>
+    </div>
+
     <!-- Subscription -->
     <div class="bg-white rounded-xl border border-ink/10 p-6">
         <h2 class="font-display font-semibold mb-1">Subscription</h2>
@@ -59,21 +93,18 @@
         </div>
     </div>
 
-    <!-- Quick actions -->
-    <div class="bg-white rounded-xl border border-ink/10 p-6">
+    <!-- Platform actions -->
+    <div class="bg-white rounded-xl border border-ink/10 p-6 md:col-span-2">
         <h2 class="font-display font-semibold mb-5">Platform actions</h2>
-        <div class="space-y-3">
-            <form method="POST" action="<?= url('/superadmin/organizations/' . $org['id'] . '/toggle') ?>" onsubmit="return confirmAction('Toggle this organisation\'s active status?')">
-                <?= csrfField() ?>
-                <button type="submit" class="w-full border border-ink/15 px-4 py-2.5 rounded-lg text-sm font-semibold text-ink/70 hover:border-brick hover:text-brick transition text-left">
-                    <?= $org['is_active'] ? 'Deactivate organisation' : 'Reactivate organisation' ?>
-                </button>
-            </form>
-            <a href="<?= url('/superadmin/organizations/' . $org['id'] . '/impersonate') ?>"
-                class="block border border-ink/15 px-4 py-2.5 rounded-lg text-sm font-semibold text-ink/70 hover:border-blue-300 hover:text-blue-700 transition">
-                Log in as org admin
-            </a>
-        </div>
+        <form method="POST" action="<?= url('/superadmin/organizations/' . $org['id'] . '/toggle') ?>" onsubmit="return confirmAction('Toggle this organisation\'s active status?')">
+            <?= csrfField() ?>
+            <button type="submit" class="border border-ink/15 px-4 py-2.5 rounded-lg text-sm font-semibold text-ink/70 hover:border-brick hover:text-brick transition">
+                <?= $org['is_active'] ? 'Deactivate organisation' : 'Reactivate organisation' ?>
+            </button>
+        </form>
+        <?php if (!$org['is_active']): ?>
+            <p class="text-xs text-red-600 mt-2">This organisation is currently deactivated — users cannot log in.</p>
+        <?php endif; ?>
     </div>
 </div>
 

@@ -36,6 +36,8 @@ $router->get('/superadmin/organizations',      'superadmin/organizations.php',  
 $router->post('/superadmin/organizations',     'superadmin/organizations.php',    ['auth_superadmin']);
 $router->get('/superadmin/organizations/{id}', 'superadmin/organization_view.php',['auth_superadmin']);
 $router->post('/superadmin/organizations/{id}/status', 'superadmin/organization_status.php', ['auth_superadmin']);
+$router->post('/superadmin/organizations/{id}/update', 'superadmin/organization_update.php', ['auth_superadmin']);
+$router->post('/superadmin/organizations/{id}/toggle', 'superadmin/organization_toggle.php', ['auth_superadmin']);
 $router->get('/superadmin/users',              'superadmin/users.php',            ['auth_superadmin']);
 $router->get('/superadmin/reports',            'superadmin/reports.php',          ['auth_superadmin']);
 
@@ -44,17 +46,28 @@ $router->get('/orgadmin/dashboard',         'orgadmin/dashboard.php',      ['aut
 
 $router->get('/orgadmin/buildings',         'orgadmin/buildings.php',      ['auth_orgadmin']);
 $router->post('/orgadmin/buildings',        'orgadmin/buildings.php',      ['auth_orgadmin']);
+$router->post('/orgadmin/buildings/{id}/update', 'orgadmin/building_update.php', ['auth_orgadmin']);
+$router->post('/orgadmin/buildings/{id}/delete', 'orgadmin/building_delete.php', ['auth_orgadmin']);
 $router->get('/orgadmin/buildings/{id}/floors', 'orgadmin/floors.php',     ['auth_orgadmin']);
 $router->post('/orgadmin/buildings/{id}/floors','orgadmin/floors.php',     ['auth_orgadmin']);
 
+$router->post('/orgadmin/floors/{id}/update', 'orgadmin/floor_update.php', ['auth_orgadmin']);
+$router->post('/orgadmin/floors/{id}/delete', 'orgadmin/floor_delete.php', ['auth_orgadmin']);
 $router->get('/orgadmin/floors/{id}/rooms', 'orgadmin/rooms.php',          ['auth_orgadmin']);
 $router->post('/orgadmin/floors/{id}/rooms','orgadmin/rooms.php',          ['auth_orgadmin']);
+$router->post('/orgadmin/rooms/{id}/update', 'orgadmin/room_update.php',   ['auth_orgadmin']);
+$router->post('/orgadmin/rooms/{id}/delete', 'orgadmin/room_delete.php',   ['auth_orgadmin']);
 
 $router->get('/orgadmin/users',             'orgadmin/users.php',          ['auth_orgadmin']);
 $router->post('/orgadmin/users',            'orgadmin/users.php',          ['auth_orgadmin']);
 $router->post('/orgadmin/users/{id}/toggle','orgadmin/user_toggle.php',    ['auth_orgadmin']);
+$router->post('/orgadmin/users/{id}/update','orgadmin/user_update.php',    ['auth_orgadmin']);
 
 $router->get('/orgadmin/visits',            'orgadmin/visits.php',         ['auth_orgadmin']);
+$router->get('/orgadmin/visits/{id}',       'orgadmin/visit_view.php',     ['auth_orgadmin']);
+$router->post('/orgadmin/visits/{id}/cancel',  'orgadmin/visit_cancel.php',  ['auth_orgadmin']);
+$router->post('/orgadmin/visits/{id}/approve', 'orgadmin/visit_approve.php', ['auth_orgadmin']);
+$router->post('/orgadmin/visits/{id}/reject',  'orgadmin/visit_reject.php',  ['auth_orgadmin']);
 $router->get('/orgadmin/events',            'orgadmin/events.php',         ['auth_orgadmin']);
 $router->get('/orgadmin/reports',           'orgadmin/reports.php',        ['auth_orgadmin']);
 $router->get('/orgadmin/settings',          'orgadmin/settings.php',       ['auth_orgadmin']);
@@ -82,6 +95,9 @@ $router->get('/events/dashboard',      'eventmanager/dashboard.php',  ['auth_eve
 $router->get('/events/create',         'eventmanager/create.php',     ['auth_eventmanager']);
 $router->post('/events/create',        'eventmanager/create.php',     ['auth_eventmanager']);
 $router->get('/events/{id}',           'eventmanager/view.php',       ['auth_eventmanager']);
+$router->get('/events/{id}/edit',        'eventmanager/edit.php',       ['auth_eventmanager']);
+$router->post('/events/{id}/edit',       'eventmanager/edit.php',       ['auth_eventmanager']);
+$router->post('/events/{id}/cancel',     'eventmanager/cancel.php',     ['auth_eventmanager']);
 $router->get('/events/{id}/register',  'eventmanager/register_visitor.php', ['auth_eventmanager']);
 $router->post('/events/{id}/register', 'eventmanager/register_visitor.php', ['auth_eventmanager']);
 

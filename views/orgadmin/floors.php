@@ -55,9 +55,32 @@
                         <?= $f['room_count'] ?> room<?= $f['room_count'] == 1 ? '' : 's' ?>
                     </span>
                 </div>
-                <a href="<?= url('/orgadmin/floors/' . $f['id'] . '/rooms') ?>" class="inline-block mt-4 text-brick font-semibold text-sm hover:underline">
-                    Manage rooms &amp; firms &rarr;
-                </a>
+                <div class="flex flex-wrap items-center gap-3 mt-4">
+                    <a href="<?= url('/orgadmin/floors/' . $f['id'] . '/rooms') ?>" class="text-brick font-semibold text-sm hover:underline">
+                        Manage rooms &amp; firms &rarr;
+                    </a>
+                    <button type="button" onclick="toggleEl('editFloor<?= $f['id'] ?>')" class="text-sm text-ink/55 hover:text-ink font-medium">Edit</button>
+                    <form method="POST" action="<?= url('/orgadmin/floors/' . $f['id'] . '/delete') ?>" class="inline" onsubmit="return confirmAction('Delete this floor and all its rooms?')">
+                        <?= csrfField() ?>
+                        <button type="submit" class="text-sm text-red-600 hover:text-red-700 font-medium">Delete</button>
+                    </form>
+                </div>
+                <div id="editFloor<?= $f['id'] ?>" class="hidden mt-4 pt-4 border-t border-ink/10">
+                    <form method="POST" action="<?= url('/orgadmin/floors/' . $f['id'] . '/update') ?>" class="grid md:grid-cols-2 gap-3">
+                        <?= csrfField() ?>
+                        <div>
+                            <label class="block text-xs font-medium mb-1 text-ink/60">Floor name</label>
+                            <input type="text" name="name" required value="<?= e($f['name']) ?>" class="w-full px-3 py-2 rounded-lg border border-ink/15 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium mb-1 text-ink/60">Floor number</label>
+                            <input type="number" name="floor_number" value="<?= e($f['floor_number'] ?? '') ?>" class="w-full px-3 py-2 rounded-lg border border-ink/15 text-sm">
+                        </div>
+                        <div class="md:col-span-2">
+                            <button type="submit" class="bg-ink text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-brick transition">Save changes</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         <?php endforeach; ?>
     </div>

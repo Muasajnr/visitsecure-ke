@@ -11,7 +11,16 @@
         <p class="text-sm text-ink/55 mt-1"><?= e($event['building_name'] ?? '') ?><?= $event['room_name'] ? ' · ' . e($event['room_name']) : '' ?></p>
         <p class="text-sm text-ink/50 mt-1"><?= formatDate($event['start_datetime']) ?> &ndash; <?= formatDate($event['end_datetime'], 'h:i A') ?></p>
     </div>
-    <?= statusBadge($event['status']) ?>
+    <div class="flex items-center gap-3">
+        <?= statusBadge($event['status']) ?>
+        <?php if ($event['status'] !== 'cancelled'): ?>
+        <a href="<?= url('/events/' . $event['id'] . '/edit') ?>" class="text-sm text-brick font-semibold hover:underline">Edit event</a>
+        <form method="POST" action="<?= url('/events/' . $event['id'] . '/cancel') ?>" onsubmit="return confirmAction('Cancel this event?')">
+            <?= csrfField() ?>
+            <button type="submit" class="text-sm text-red-600 font-semibold hover:underline">Cancel</button>
+        </form>
+        <?php endif; ?>
+    </div>
 </div>
 
 <?php if ($event['description']): ?>

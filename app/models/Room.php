@@ -23,6 +23,19 @@ class Room
         );
     }
 
+    public static function update(int $id, int $orgId, array $data): int
+    {
+        return DB::run(
+            "UPDATE rooms SET name = ?, room_type = ?, firm_name = ? WHERE id = ? AND org_id = ?",
+            [$data['name'], $data['room_type'] ?? 'office', $data['firm_name'] ?? null, $id, $orgId]
+        );
+    }
+
+    public static function delete(int $id, int $orgId): int
+    {
+        return DB::run("DELETE FROM rooms WHERE id = ? AND org_id = ?", [$id, $orgId]);
+    }
+
     public static function allByOrg(int $orgId): array
     {
         return DB::all(

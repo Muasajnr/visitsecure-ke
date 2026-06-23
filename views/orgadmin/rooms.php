@@ -55,12 +55,13 @@
                 <th class="px-5 py-3 font-semibold">Room</th>
                 <th class="px-5 py-3 font-semibold">Type</th>
                 <th class="px-5 py-3 font-semibold">Firm / tenant</th>
+                <th class="px-5 py-3 font-semibold"></th>
             </tr>
         </thead>
         <tbody class="divide-y divide-ink/5">
             <?php if (empty($rooms)): ?>
                 <tr>
-                    <td colspan="3" class="px-5 py-12 text-center">
+                    <td colspan="4" class="px-5 py-12 text-center">
                         <p class="text-ink/35 text-sm">No rooms on this floor yet.</p>
                         <p class="text-xs text-ink/30 mt-1">Add a room above, then assign a host to it under Staff &amp; Users.</p>
                     </td>
@@ -71,6 +72,39 @@
                 <td class="px-5 py-3 font-medium"><?= e($r['name']) ?></td>
                 <td class="px-5 py-3 text-ink/60 capitalize"><?= e(str_replace('_', ' ', $r['room_type'])) ?></td>
                 <td class="px-5 py-3 text-ink/60"><?= e($r['firm_name'] ?? '—') ?></td>
+                <td class="px-5 py-3 text-right whitespace-nowrap">
+                    <button type="button" onclick="toggleEl('editRoom<?= $r['id'] ?>')" class="text-xs text-brick font-semibold hover:underline mr-3">Edit</button>
+                    <form method="POST" action="<?= url('/orgadmin/rooms/' . $r['id'] . '/delete') ?>" class="inline" onsubmit="return confirmAction('Delete this room?')">
+                        <?= csrfField() ?>
+                        <button type="submit" class="text-xs text-red-600 font-semibold hover:underline">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            <tr id="editRoom<?= $r['id'] ?>" class="hidden bg-ink/[0.02]">
+                <td colspan="4" class="px-5 py-4">
+                    <form method="POST" action="<?= url('/orgadmin/rooms/' . $r['id'] . '/update') ?>" class="grid md:grid-cols-4 gap-3 items-end">
+                        <?= csrfField() ?>
+                        <div>
+                            <label class="block text-xs font-medium mb-1 text-ink/60">Room name</label>
+                            <input type="text" name="name" required value="<?= e($r['name']) ?>" class="w-full px-3 py-2 rounded-lg border border-ink/15 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium mb-1 text-ink/60">Type</label>
+                            <select name="room_type" class="w-full px-3 py-2 rounded-lg border border-ink/15 text-sm">
+                                <?php foreach (['office','conference','reception','other'] as $rt): ?>
+                                    <option value="<?= $rt ?>" <?= $r['room_type'] === $rt ? 'selected' : '' ?>><?= ucfirst($rt) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium mb-1 text-ink/60">Firm / tenant</label>
+                            <input type="text" name="firm_name" value="<?= e($r['firm_name'] ?? '') ?>" class="w-full px-3 py-2 rounded-lg border border-ink/15 text-sm">
+                        </div>
+                        <div>
+                            <button type="submit" class="bg-ink text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-brick transition w-full">Save</button>
+                        </div>
+                    </form>
+                </td>
             </tr>
             <?php endforeach; ?>
         </tbody>

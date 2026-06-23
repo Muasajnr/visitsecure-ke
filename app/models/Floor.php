@@ -28,6 +28,19 @@ class Floor
         );
     }
 
+    public static function update(int $id, int $orgId, array $data): int
+    {
+        return DB::run(
+            "UPDATE floors SET name = ?, floor_number = ? WHERE id = ? AND org_id = ?",
+            [$data['name'], $data['floor_number'] ?? null, $id, $orgId]
+        );
+    }
+
+    public static function delete(int $id, int $orgId): int
+    {
+        return DB::run("DELETE FROM floors WHERE id = ? AND org_id = ?", [$id, $orgId]);
+    }
+
     public static function allByOrg(int $orgId): array
     {
         return DB::all(

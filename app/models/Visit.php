@@ -103,6 +103,14 @@ class Visit
         );
     }
 
+    public static function cancel(int $id, int $orgId): int
+    {
+        return DB::run(
+            "UPDATE visits SET status = 'cancelled' WHERE id = ? AND org_id = ? AND status IN ('pending','approved')",
+            [$id, $orgId]
+        );
+    }
+
     public static function listByOrg(int $orgId, array $filters = [], int $limit = 100): array
     {
         $sql = "SELECT v.*, b.name AS building_name, r.name AS room_name, h.full_name AS host_name
