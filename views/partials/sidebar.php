@@ -77,10 +77,10 @@ function navLink(string $href, string $label, string $iconName, string $currentP
         <div class="pt-3 mt-3 border-t border-white/10">
             <?= navLink('/notifications', 'Notifications', 'bell', $path) ?>
             <?= navLink('/profile',       'My Profile',    'user', $path) ?>
-            <a href="<?= url('/logout') ?>" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm mt-1 text-red-300 hover:bg-red-500/15 hover:text-red-200 transition font-medium">
+            <!-- <a href="<?= url('/logout') ?>" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm mt-1 text-red-300 hover:bg-red-500/15 hover:text-red-200 transition font-medium">
                 <?= icon('logout', 'w-5 h-5 shrink-0') ?>
                 <span>Log out</span>
-            </a>
+            </a> -->
         </div>
     </nav>
 
