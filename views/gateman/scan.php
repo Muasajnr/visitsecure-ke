@@ -37,8 +37,18 @@
         </div>
     </div>
 
-    <!-- Manual -->
+    <!-- Upload -->
     <div class="bg-white rounded-xl border border-ink/10 p-5">
+        <h2 class="font-display font-semibold mb-1">Upload gate pass</h2>
+        <p class="text-sm text-ink/55 mb-5 leading-relaxed">Camera unavailable? Upload a clear image or PDF containing the visitor's QR code.</p>
+        <label for="qr-file-input" class="block text-sm font-medium mb-1.5 text-ink/75">Gate pass file</label>
+        <input type="file" id="qr-file-input" accept="image/*,.pdf,application/pdf" class="block w-full text-sm text-ink/60 file:mr-3 file:rounded-lg file:border-0 file:bg-ink file:px-4 file:py-2.5 file:font-semibold file:text-white hover:file:bg-brick">
+        <p id="qr-file-status" class="mt-3 text-xs text-ink/45 leading-relaxed">Supported: JPG, PNG, WEBP, and PDF.</p>
+        <div id="qr-file-reader" class="absolute w-px h-px overflow-hidden opacity-0 pointer-events-none"></div>
+    </div>
+
+    <!-- Manual -->
+    <div class="bg-white rounded-xl border border-ink/10 p-5 md:col-span-2">
         <h2 class="font-display font-semibold mb-1">Manual token entry</h2>
         <p class="text-sm text-ink/55 mb-5 leading-relaxed">Camera not working? Type the token printed below the QR code on the visitor's gate pass.</p>
         <form method="POST" action="<?= url('/gateman/scan') ?>" id="manualForm" class="space-y-4">
@@ -72,6 +82,7 @@
 </div>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
 (function () {
     var statusEl = document.getElementById('qr-reader-status');
@@ -79,20 +90,46 @@
     var scanner = null;
     var hasScanned = false;
     var scanConfig = { fps: 10, qrbox: { width: 220, height: 220 }, aspectRatio: 1.0 };
+    var fileInput = document.getElementById('qr-file-input');
+    var fileStatus = document.getElementById('qr-file-status');
+
+    if (typeof pdfjsLib !== 'undefined') {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
 
     if (typeof Html5Qrcode === 'undefined') {
         statusEl.textContent = 'Camera library failed to load — use manual entry.';
         startBtn.disabled = true;
-        return;
     }
 
     function onScanSuccess(decoded) {
         if (hasScanned) return;
+        decoded = normalizeDecodedToken(decoded);
+        if (!decoded) {
+            fileStatus.textContent = 'A QR code was detected, but it did not contain a valid gate-pass token.';
+            return;
+        }
         hasScanned = true;
         statusEl.textContent = 'Gate pass detected — checking in...';
+        fileStatus.textContent = 'QR code found. Checking in...';
         document.getElementById('tokenInput').value = decoded.trim();
         document.getElementById('manualAction').value = 'checkin';
         document.getElementById('manualForm').submit();
+    }
+
+    function normalizeDecodedToken(decoded) {
+        var value = String(decoded || '').trim();
+        try {
+            var url = new URL(value, window.location.origin);
+            var marker = '/verify/';
+            var markerIndex = url.pathname.indexOf(marker);
+            if (markerIndex !== -1) {
+                return decodeURIComponent(url.pathname.slice(markerIndex + marker.length)).split('/')[0];
+            }
+        } catch (error) {
+            // The QR payload is a raw token rather than a URL.
+        }
+        return value;
     }
 
     function onScanError() {
@@ -116,6 +153,15 @@
                 scanner = null;
             });
         }
+    }
+
+    function stopScanner() {
+        if (!scanner) return Promise.resolve();
+        return scanner.stop().catch(function () {}).then(function () {
+            return scanner.clear().catch(function () {});
+        }).then(function () {
+            scanner = null;
+        });
     }
 
     function startWithFacingMode() {
@@ -154,22 +200,23 @@
                 // Some browsers still allow Html5Qrcode to prompt on start().
             })
             .then(function () {
-                if (scanner) {
-                    return scanner.stop().catch(function () {}).then(function () {
-                        return scanner.clear().catch(function () {});
-                    });
-                }
+                return stopScanner();
             })
             .then(function () {
                 scanner = new Html5Qrcode('qr-reader');
                 return startWithFacingMode().catch(function () {
-                    return startWithDeviceList();
+                    return stopScanner().then(function () {
+                        scanner = new Html5Qrcode('qr-reader');
+                        return startWithDeviceList();
+                    });
                 });
             })
             .then(cameraReady)
             .catch(function (err) {
                 var msg = 'Could not access the camera.';
-                if (err && err.name === 'NotAllowedError') {
+                if (window.isSecureContext === false && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+                    msg = 'Camera access requires HTTPS. Open this site over HTTPS, or use the image/PDF upload option below.';
+                } else if (err && err.name === 'NotAllowedError') {
                     msg = 'Camera permission was denied. Click "Try camera again" and choose Allow in the browser prompt, or use manual entry below.';
                 } else if (err && err.name === 'NotFoundError') {
                     msg = 'No camera found on this device. Use manual entry below.';
@@ -182,6 +229,89 @@
             });
     }
 
-    startBtn.addEventListener('click', startScanner);
+    function scanImageFile(file) {
+        if (typeof Html5Qrcode === 'undefined') {
+            return Promise.reject(new Error('QR scanning library failed to load. Refresh the page and try again.'));
+        }
+        fileStatus.textContent = 'Reading QR code from the uploaded image...';
+        return stopScanner().then(function () {
+            var fileScanner = new Html5Qrcode('qr-file-reader');
+            return fileScanner.scanFile(file, true).then(function (decoded) {
+                fileScanner.clear().catch(function () {});
+                onScanSuccess(decoded);
+            }).catch(function (error) {
+                fileScanner.clear().catch(function () {});
+                throw error;
+            });
+        });
+    }
+
+    function scanPdf(file) {
+        if (typeof pdfjsLib === 'undefined') {
+            return Promise.reject(new Error('PDF support could not be loaded.'));
+        }
+        return file.arrayBuffer().then(function (buffer) {
+            return pdfjsLib.getDocument({ data: buffer }).promise;
+        }).then(function (pdf) {
+            var pageNumber = 1;
+            var renderScales = [2, 3, 4];
+
+            function nextPage() {
+                if (pageNumber > pdf.numPages) {
+                    throw new Error('No QR code was found in this PDF.');
+                }
+                fileStatus.textContent = 'Checking PDF page ' + pageNumber + ' of ' + pdf.numPages + '...';
+                var currentPage = pageNumber++;
+                return pdf.getPage(currentPage).then(function (page) {
+                    function tryScale(scaleIndex) {
+                        if (scaleIndex >= renderScales.length) return nextPage();
+                        var viewport = page.getViewport({ scale: renderScales[scaleIndex] });
+                        fileStatus.textContent = 'Checking PDF page ' + currentPage + ' at scan quality ' + (scaleIndex + 1) + ' of ' + renderScales.length + '...';
+                    var canvas = document.createElement('canvas');
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+                    return page.render({ canvasContext: canvas.getContext('2d'), viewport: viewport }).promise.then(function () {
+                        return new Promise(function (resolve) {
+                            canvas.toBlob(function (blob) {
+                                if (!blob) {
+                                    resolve(null);
+                                    return;
+                                }
+                                resolve(new File([blob], 'pdf-page-' + currentPage + '-' + scaleIndex + '.png', { type: 'image/png' }));
+                            }, 'image/png');
+                        });
+                    }).then(function (blob) {
+                        if (!blob) return tryScale(scaleIndex + 1);
+                        return scanImageFile(blob).then(resolveScan).catch(function () {
+                            return tryScale(scaleIndex + 1);
+                        });
+                    });
+                    }
+                    return tryScale(0);
+                });
+            }
+
+            function resolveScan(result) { return result; }
+            return nextPage();
+        });
+    }
+
+    fileInput.addEventListener('change', function () {
+        var file = fileInput.files[0];
+        if (!file) return;
+        hasScanned = false;
+        var promise = file.type === 'application/pdf' || file.name.toLowerCase().slice(-4) === '.pdf'
+            ? scanPdf(file)
+            : scanImageFile(file);
+        promise.then(function () {
+            fileStatus.textContent = 'QR code found. Checking in...';
+        }).catch(function (error) {
+            fileStatus.textContent = (error && error.message ? error.message : 'Could not read a QR code from that file.') + ' Try a clearer file or use manual entry.';
+        });
+    });
+
+    if (typeof Html5Qrcode !== 'undefined') {
+        startBtn.addEventListener('click', startScanner);
+    }
 })();
 </script>
