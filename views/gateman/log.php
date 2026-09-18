@@ -35,11 +35,12 @@
                     <th class="px-5 py-3">In</th>
                     <th class="px-5 py-3">Out</th>
                     <th class="px-5 py-3">Status</th>
+                    <th class="px-5 py-3"></th>
                 </tr>
             </thead>
             <tbody>
                 <?php if (empty($visits)): ?>
-                    <tr><td colspan="6" class="px-5 py-8 text-center text-ink/40">No visits found for this filter.</td></tr>
+                    <tr><td colspan="7" class="px-5 py-8 text-center text-ink/40">No visits found for this filter.</td></tr>
                 <?php endif; ?>
                 <?php foreach ($visits as $v): ?>
                 <tr class="border-b border-ink/5 last:border-0">
@@ -49,6 +50,14 @@
                     <td class="px-5 py-3 text-ink/50"><?= formatDate($v['checked_in_at'] ?? null, 'h:i A') ?></td>
                     <td class="px-5 py-3 text-ink/50"><?= formatDate($v['checked_out_at'] ?? null, 'h:i A') ?></td>
                     <td class="px-5 py-3"><?= statusBadge($v['status']) ?></td>
+                    <td class="px-5 py-3 text-right">
+                        <?php if ($v['status'] === 'approved' && (int)($v['is_walk_in'] ?? 0) === 1): ?>
+                            <form method="POST" action="<?= url('/gateman/checkin/' . $v['id']) ?>" onsubmit="return confirmAction('Check in <?= e(addslashes($v['visitor_name'])) ?>?')">
+                                <?= csrfField() ?>
+                                <button type="submit" class="text-green-700 font-semibold text-xs hover:underline">Check in</button>
+                            </form>
+                        <?php endif; ?>
+                    </td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>

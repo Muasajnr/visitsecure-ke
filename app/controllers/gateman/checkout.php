@@ -23,7 +23,19 @@ if ($visit['status'] !== 'checked_in') {
     redirect('/gateman/dashboard');
 }
 
-Visit::checkOut($visitId, Auth::id());
+$confirmation = preg_replace('/\s+/', ' ', trim(input('checkout_confirmation', '')));
+$visitorName = preg_replace('/\s+/', ' ', trim($visit['visitor_name']));
+
+if (strcasecmp($confirmation, $visitorName) !== 0) {
+    flash('error', 'Checkout cancelled. Type the visitor\'s full name exactly as shown to confirm.');
+    redirect('/gateman/dashboard');
+}
+
+if (Visit::checkOut($visitId, Auth::id()) !== 1) {
+    flash('error', 'This visitor could not be checked out. Please refresh and try again.');
+    redirect('/gateman/dashboard');
+}
+
 logAudit($orgId, Auth::id(), 'visitor_checked_out', "Checked out {$visit['visitor_name']}");
 
 flash('success', "{$visit['visitor_name']} has been checked out.");

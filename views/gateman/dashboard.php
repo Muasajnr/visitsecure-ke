@@ -78,8 +78,9 @@ $shift = $hour < 12 ? 'Morning' : ($hour < 17 ? 'Afternoon' : 'Evening');
                 </td>
                 <td class="px-5 py-3 text-ink/50 tabular-nums"><?= formatDate($v['checked_in_at'], 'h:i A') ?></td>
                 <td class="px-5 py-3 text-right">
-                    <form method="POST" action="<?= url('/gateman/checkout/' . $v['id']) ?>" onsubmit="return confirmAction('Check out <?= e(addslashes($v['visitor_name'])) ?>?')">
+                    <form method="POST" action="<?= url('/gateman/checkout/' . $v['id']) ?>" data-visitor-name="<?= e($v['visitor_name']) ?>" onsubmit="return openCheckoutConfirmation(this)">
                         <?= csrfField() ?>
+                        <input type="hidden" name="checkout_confirmation" value="">
                         <button type="submit" class="text-brick font-semibold text-xs hover:underline">Check out</button>
                     </form>
                 </td>
@@ -87,4 +88,19 @@ $shift = $hour < 12 ? 'Morning' : ($hour < 17 ? 'Afternoon' : 'Evening');
             <?php endforeach; ?>
         </tbody>
     </table>
+</div>
+
+<div id="checkout-modal" class="hidden fixed inset-0 z-50 items-center justify-center bg-ink/40 px-4" role="dialog" aria-modal="true" aria-labelledby="checkout-modal-title">
+    <div class="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
+        <h2 id="checkout-modal-title" class="font-display text-xl font-semibold">Confirm checkout</h2>
+        <p class="mt-2 text-sm text-ink/60">You are checking out:</p>
+        <p id="checkout-visitor-name" class="mt-1 font-semibold text-ink"></p>
+        <label for="checkout-name-input" class="mt-5 block text-sm font-medium text-ink/75">Type the visitor's full name to continue</label>
+        <input type="text" id="checkout-name-input" autocomplete="off" class="mt-1.5 w-full rounded-lg border border-ink/15 px-4 py-2.5 text-sm focus:border-blue-300 focus:ring-2 focus:ring-blue-100" aria-describedby="checkout-name-error">
+        <p id="checkout-name-error" class="mt-2 hidden text-sm text-red-700">The name does not match. Please type it exactly as shown.</p>
+        <div class="mt-5 flex justify-end gap-3">
+            <button type="button" onclick="closeCheckoutConfirmation()" class="rounded-lg border border-ink/15 px-4 py-2.5 text-sm font-semibold text-ink/70 hover:bg-ink/5">Cancel</button>
+            <button type="button" onclick="submitCheckoutConfirmation()" class="rounded-lg bg-brick px-4 py-2.5 text-sm font-semibold text-white hover:bg-ink">Confirm checkout</button>
+        </div>
+    </div>
 </div>

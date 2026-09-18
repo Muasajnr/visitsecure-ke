@@ -80,6 +80,7 @@ $router->post('/gateman/scan',         'gateman/scan.php',        ['auth_gateman
 $router->get('/gateman/walkin',        'gateman/walkin.php',      ['auth_gateman']);
 $router->post('/gateman/walkin',       'gateman/walkin.php',      ['auth_gateman']);
 $router->get('/gateman/log',           'gateman/log.php',         ['auth_gateman']);
+$router->post('/gateman/checkin/{id}', 'gateman/checkin.php',     ['auth_gateman']);
 $router->post('/gateman/checkout/{id}','gateman/checkout.php',    ['auth_gateman']);
 
 // ===================== HOST =====================
