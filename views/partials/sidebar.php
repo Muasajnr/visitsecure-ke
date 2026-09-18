@@ -38,6 +38,7 @@ function navLink(string $href, string $label, string $iconName, string $currentP
             <?= navLink('/superadmin/dashboard',     'Dashboard',        'dashboard', $path) ?>
             <?= navLink('/superadmin/organizations', 'Organisations',    'building', $path) ?>
             <?= navLink('/superadmin/users',         'All Users',        'users', $path) ?>
+            <?= navLink('/superadmin/visitors',      'Visitors',         'users', $path) ?>
             <?= navLink('/superadmin/reports',       'Reports',          'chart-bar', $path) ?>
 
         <?php elseif ($role === 'org_admin'): ?>

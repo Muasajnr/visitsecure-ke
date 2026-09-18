@@ -40,6 +40,9 @@ $router->post('/superadmin/organizations/{id}/update', 'superadmin/organization_
 $router->post('/superadmin/organizations/{id}/toggle', 'superadmin/organization_toggle.php', ['auth_superadmin']);
 $router->get('/superadmin/users',              'superadmin/users.php',            ['auth_superadmin']);
 $router->get('/superadmin/reports',            'superadmin/reports.php',          ['auth_superadmin']);
+$router->get('/superadmin/reports/export',     'superadmin/reports_export.php',   ['auth_superadmin']);
+$router->get('/superadmin/visitors',           'superadmin/visitors.php',         ['auth_superadmin']);
+$router->post('/superadmin/visitors/{id}/cancel', 'superadmin/visitor_cancel.php',['auth_superadmin']);
 
 // ===================== ORG ADMIN =====================
 $router->get('/orgadmin/dashboard',         'orgadmin/dashboard.php',      ['auth_orgadmin']);
@@ -70,6 +73,7 @@ $router->post('/orgadmin/visits/{id}/approve', 'orgadmin/visit_approve.php', ['a
 $router->post('/orgadmin/visits/{id}/reject',  'orgadmin/visit_reject.php',  ['auth_orgadmin']);
 $router->get('/orgadmin/events',            'orgadmin/events.php',         ['auth_orgadmin']);
 $router->get('/orgadmin/reports',           'orgadmin/reports.php',        ['auth_orgadmin']);
+$router->get('/orgadmin/reports/export',    'orgadmin/reports_export.php', ['auth_orgadmin']);
 $router->get('/orgadmin/settings',          'orgadmin/settings.php',       ['auth_orgadmin']);
 $router->post('/orgadmin/settings',         'orgadmin/settings.php',       ['auth_orgadmin']);
 
